@@ -7,7 +7,7 @@ import lombok.Data;
 @Builder
 public class Fund {
 
-    Long id;
-    String name;
-    FundType type;
+    private Long id;
+    private String name;
+    private FundType type;
 }
