@@ -1,5 +1,7 @@
 package org.example.investmentfunds
 
+import org.example.investmentfunds.investment.style.Agressive
+import org.example.investmentfunds.investment.style.Balanced
 import org.example.investmentfunds.investment.style.Safe
 import org.example.investmentfunds.model.AmountPercentPair
 import org.example.investmentfunds.model.Fund
@@ -19,7 +21,7 @@ class InvestmentCalculatorTest extends Specification {
 
     InvestmentCalculator ic = new InvestmentCalculatorImpl()
 
-    def "should return funds distribution"() {
+    def "should return funds distribution for safe style"() {
         given:
         def expectedOutputMap = [
                 1L:AmountPercentPair.builder().fundID(1L).amount(1000).percent("10").build(),
@@ -32,6 +34,42 @@ class InvestmentCalculatorTest extends Specification {
         def expectedOutputRest = 0
         when:
         def calculatedDistribution= ic.calculateFundsDistribution(fundList, 10000, new Safe())
+        then:
+        calculatedDistribution.distributionMap == expectedOutputMap
+        calculatedDistribution.undistributedRest == expectedOutputRest
+    }
+
+    def "should return funds distribution for agressive style"() {
+        given:
+        def expectedOutputMap = [
+                1L:AmountPercentPair.builder().fundID(1L).amount(2000).percent("20").build(),
+                2L:AmountPercentPair.builder().fundID(2L).amount(2000).percent("20").build(),
+                3L:AmountPercentPair.builder().fundID(3L).amount(668).percent("6.68").build(),
+                4L:AmountPercentPair.builder().fundID(4L).amount(666).percent("6.66").build(),
+                5L:AmountPercentPair.builder().fundID(5L).amount(666).percent("6.66").build(),
+                6L:AmountPercentPair.builder().fundID(6L).amount(4000).percent("40").build(),
+        ]
+        def expectedOutputRest = 0
+        when:
+        def calculatedDistribution= ic.calculateFundsDistribution(fundList, 10000, new Agressive())
+        then:
+        calculatedDistribution.distributionMap == expectedOutputMap
+        calculatedDistribution.undistributedRest == expectedOutputRest
+    }
+
+    def "should return funds distribution for balanced style"() {
+        given:
+        def expectedOutputMap = [
+                1L:AmountPercentPair.builder().fundID(1L).amount(1500).percent("15").build(),
+                2L:AmountPercentPair.builder().fundID(2L).amount(1500).percent("15").build(),
+                3L:AmountPercentPair.builder().fundID(3L).amount(2000).percent("20").build(),
+                4L:AmountPercentPair.builder().fundID(4L).amount(2000).percent("20").build(),
+                5L:AmountPercentPair.builder().fundID(5L).amount(2000).percent("20").build(),
+                6L:AmountPercentPair.builder().fundID(6L).amount(1000).percent("10").build(),
+        ]
+        def expectedOutputRest = 0
+        when:
+        def calculatedDistribution= ic.calculateFundsDistribution(fundList, 10000, new Balanced())
         then:
         calculatedDistribution.distributionMap == expectedOutputMap
         calculatedDistribution.undistributedRest == expectedOutputRest

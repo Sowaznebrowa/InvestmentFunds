@@ -16,9 +16,19 @@ import java.util.stream.Collectors;
 public class InvestmentCalculatorImpl implements InvestmentCalculator {
 
     public DistributionCalculation calculateFundsDistribution(List<Fund> listOfFunds, Integer investmentAmount, InvestmentStyle investmentStyle) {
-
         Map<FundType, BigDecimal> investmentRatioMap = investmentStyle.getInvestmentRatioMap();
+        List<AmountPercentPair> amountPercentPairsList = calculateAmountPercentPairs(listOfFunds, investmentAmount, investmentRatioMap);
+        Integer rest = calculateUndistributedRest(investmentAmount, amountPercentPairsList);
+        Map<Long, AmountPercentPair> distributionMap = amountPercentPairsList.stream()
+                                                                             .collect(Collectors.toMap(AmountPercentPair::getFundID,
+                                                                                                       amountPercentPair -> amountPercentPair));
+        return DistributionCalculation.builder()
+                                      .distributionMap(distributionMap)
+                                      .undistributedRest(rest)
+                                      .build();
+    }
 
+    private List<AmountPercentPair> calculateAmountPercentPairs(List<Fund> listOfFunds, Integer investmentAmount, Map<FundType, BigDecimal> investmentRatioMap) {
         Map<FundType, List<Fund>> fundsGroupedByType = listOfFunds
                 .stream()
                 .collect(Collectors.groupingBy(Fund::getType));
@@ -26,24 +36,12 @@ public class InvestmentCalculatorImpl implements InvestmentCalculator {
         List<AmountPercentPair> amountPercentPairsList = new ArrayList<>();
 
         fundsGroupedByType.keySet()
-                          .forEach(key -> {
-                              amountPercentPairsList.addAll(
-                                      distribiuteListOfFunds(fundsGroupedByType.get(key), investmentAmount, investmentRatioMap.get(key)));
-                          });
-
-        Integer rest = calculateUndistributedRest(investmentAmount, amountPercentPairsList);
-
-        Map<Long, AmountPercentPair> distributionMap = amountPercentPairsList.stream()
-                                                                             .collect(Collectors.toMap(AmountPercentPair::getFundID,
-                                                                                                       amountPercentPair -> amountPercentPair));
-
-        return DistributionCalculation.builder()
-                                      .distributionMap(distributionMap)
-                                      .undistributedRest(rest)
-                                      .build();
+                          .forEach(key -> amountPercentPairsList.addAll(
+                                  distributeListOfFunds(fundsGroupedByType.get(key), investmentAmount, investmentRatioMap.get(key))));
+        return amountPercentPairsList;
     }
 
-    private List<AmountPercentPair> distribiuteListOfFunds(List<Fund> funds, Integer investmentAmount, BigDecimal investmentRatio) {
+    private List<AmountPercentPair> distributeListOfFunds(List<Fund> funds, Integer investmentAmount, BigDecimal investmentRatio) {
         if (funds.isEmpty()) {
             return new ArrayList<>();
         }
@@ -53,17 +51,11 @@ public class InvestmentCalculatorImpl implements InvestmentCalculator {
         BigDecimal availableAmount = BigDecimal.valueOf(investmentAmount);
         BigDecimal singleFundRatio = investmentRatio.divide(BigDecimal.valueOf(listSize), 4, RoundingMode.DOWN);
         List<AmountPercentPair> distributionList = new ArrayList<>();
-        funds.forEach(fund -> {
-            distributionList.add(AmountPercentPair.builder()
-                                                  .fundID(fund.getId())
-                                                  .amount(availableAmount.multiply(singleFundRatio)
-                                                                         .intValue())
-                                                  .percent(singleFundRatio.multiply(HUNDRED_PERCENT)
-                                                                          .setScale(2, RoundingMode.DOWN)
-                                                                          .stripTrailingZeros()
-                                                                          .toPlainString())
-                                                  .build());
-        });
+        funds.forEach(fund -> distributionList.add(AmountPercentPair.builder()
+                                                                .fundID(fund.getId())
+                                                                .amount(availableAmount.multiply(singleFundRatio).intValue())
+                                                                .percent(formatPercentDisplay(singleFundRatio.multiply(HUNDRED_PERCENT)))
+                                                                .build()));
         if (!singleFundRatio.multiply(BigDecimal.valueOf(listSize))
                             .equals(investmentRatio)) {
             BigDecimal delta = investmentRatio.subtract(singleFundRatio.multiply(BigDecimal.valueOf(listSize)));
@@ -72,10 +64,7 @@ public class InvestmentCalculatorImpl implements InvestmentCalculator {
                             .setAmount(enlargedSingleFundRatio.multiply(availableAmount)
                                                               .intValue());
             distributionList.get(FIRST_ELEMENT)
-                            .setPercent(enlargedSingleFundRatio.multiply(HUNDRED_PERCENT)
-                                                               .setScale(2, RoundingMode.DOWN)
-                                                               .stripTrailingZeros()
-                                                               .toPlainString());
+                            .setPercent(formatPercentDisplay(enlargedSingleFundRatio.multiply(HUNDRED_PERCENT)));
         }
         return distributionList;
     }
@@ -87,6 +76,10 @@ public class InvestmentCalculatorImpl implements InvestmentCalculator {
                 .reduce(Integer::sum)
                 .orElse(0);
         return investmentAmount - distributedSum;
+    }
+
+    private String formatPercentDisplay(BigDecimal numberToFormat){
+        return numberToFormat.setScale(2, RoundingMode.DOWN).stripTrailingZeros().toPlainString();
     }
 
 }
