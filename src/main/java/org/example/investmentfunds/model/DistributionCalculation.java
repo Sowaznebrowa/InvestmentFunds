@@ -9,6 +9,6 @@ import java.util.Map;
 @Builder
 public class DistributionCalculation {
 
-    private Map<Long,Integer> distributionMap;
+    private Map<Long, AmountPercentPair> distributionMap;
     private Integer undistributedRest;
 }

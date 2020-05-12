@@ -1,6 +1,7 @@
 package org.example.investmentfunds
 
 import org.example.investmentfunds.investment.style.Safe
+import org.example.investmentfunds.model.AmountPercentPair
 import org.example.investmentfunds.model.Fund
 import org.example.investmentfunds.model.FundType
 import spock.lang.Specification
@@ -21,12 +22,12 @@ class InvestmentCalculatorTest extends Specification {
     def "should return funds distribution"() {
         given:
         def expectedOutputMap = [
-            1L:1000,
-            2L:1000,
-            3L:2500,
-            4L:2500,
-            5L:2500,
-            6L:500,
+                1L:AmountPercentPair.builder().fundID(1L).amount(1000).percent("10").build(),
+                2L:AmountPercentPair.builder().fundID(2L).amount(1000).percent("10").build(),
+                3L:AmountPercentPair.builder().fundID(3L).amount(2500).percent("25").build(),
+                4L:AmountPercentPair.builder().fundID(4L).amount(2500).percent("25").build(),
+                5L:AmountPercentPair.builder().fundID(5L).amount(2500).percent("25").build(),
+                6L:AmountPercentPair.builder().fundID(6L).amount(500).percent("5").build(),
         ]
         def expectedOutputRest = 0
         when:
@@ -39,12 +40,12 @@ class InvestmentCalculatorTest extends Specification {
     def "should return funds distribution with undistributed rest"() {
         given:
         def expectedOutputMap = [
-                1L:1000,
-                2L:1000,
-                3L:2500,
-                4L:2500,
-                5L:2500,
-                6L:500,
+                1L:AmountPercentPair.builder().fundID(1L).amount(1000).percent("10").build(),
+                2L:AmountPercentPair.builder().fundID(2L).amount(1000).percent("10").build(),
+                3L:AmountPercentPair.builder().fundID(3L).amount(2500).percent("25").build(),
+                4L:AmountPercentPair.builder().fundID(4L).amount(2500).percent("25").build(),
+                5L:AmountPercentPair.builder().fundID(5L).amount(2500).percent("25").build(),
+                6L:AmountPercentPair.builder().fundID(6L).amount(500).percent("5").build(),
         ]
         def expectedOutputRest = 1
         when:
@@ -65,12 +66,12 @@ class InvestmentCalculatorTest extends Specification {
                 Fund.builder().id(6).type(FundType.CASH).name("Fundusz Pieniężny 1").build(),
         ]
         def expectedOutputMap = [
-                1L:668,
-                2L:666,
-                3L:666,
-                4L:3750,
-                5L:3750,
-                6L:500,
+                1L:AmountPercentPair.builder().fundID(1L).amount(668).percent("6.68").build(),
+                2L:AmountPercentPair.builder().fundID(2L).amount(666).percent("6.66").build(),
+                3L:AmountPercentPair.builder().fundID(3L).amount(666).percent("6.66").build(),
+                4L:AmountPercentPair.builder().fundID(4L).amount(3750).percent("37.5").build(),
+                5L:AmountPercentPair.builder().fundID(5L).amount(3750).percent("37.5").build(),
+                6L:AmountPercentPair.builder().fundID(6L).amount(500).percent("5").build(),
         ]
         def expectedOutputRest = 0
         when:

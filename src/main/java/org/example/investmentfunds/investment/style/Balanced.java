@@ -2,13 +2,15 @@ package org.example.investmentfunds.investment.style;
 
 import org.example.investmentfunds.model.FundType;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 public class Balanced implements InvestmentStyle {
 
-    //TODO: change double to big decimal
     @Override
-    public Map<FundType, Double> getInvestmentRatioMap() {
-        return Map.of(FundType.POLISH, 0.3, FundType.FOREIGN, 0.6, FundType.CASH, 0.1);
+    public Map<FundType, BigDecimal> getInvestmentRatioMap() {
+        return Map.of(FundType.POLISH, new BigDecimal("0.30"),
+                      FundType.FOREIGN, new BigDecimal("0.60"),
+                      FundType.CASH, new BigDecimal("0.10"));
     }
 }
