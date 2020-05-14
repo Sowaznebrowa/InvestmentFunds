@@ -1,4 +1,4 @@
-package org.example.investmentfunds.model;
+package org.example.investmentfunds.fund;
 
 public enum FundType {
     POLISH,

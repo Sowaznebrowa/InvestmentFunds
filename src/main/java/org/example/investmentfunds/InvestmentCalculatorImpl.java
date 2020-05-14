@@ -1,85 +1,61 @@
 package org.example.investmentfunds;
 
+import org.example.investmentfunds.distribution.DistributionCalculation;
+import org.example.investmentfunds.distribution.DistributionCalculator;
+import org.example.investmentfunds.fund.Fund;
+import org.example.investmentfunds.fund.FundType;
 import org.example.investmentfunds.investment.style.InvestmentStyle;
-import org.example.investmentfunds.model.AmountPercentPair;
-import org.example.investmentfunds.model.DistributionCalculation;
-import org.example.investmentfunds.model.Fund;
-import org.example.investmentfunds.model.FundType;
+import org.example.investmentfunds.result.CalculationResult;
+import org.example.investmentfunds.result.ResultListProducer;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 public class InvestmentCalculatorImpl implements InvestmentCalculator {
 
+    private DistributionCalculator distributionCalculator;
+    private ResultListProducer resultListProducer;
+
+    public InvestmentCalculatorImpl(DistributionCalculator distributionCalculator, ResultListProducer resultListProducer) {
+        this.distributionCalculator = distributionCalculator;
+        this.resultListProducer = resultListProducer;
+    }
+
     public DistributionCalculation calculateFundsDistribution(List<Fund> listOfFunds, Integer investmentAmount, InvestmentStyle investmentStyle) {
-        Map<FundType, BigDecimal> investmentRatioMap = investmentStyle.getInvestmentRatioMap();
-        List<AmountPercentPair> amountPercentPairsList = calculateAmountPercentPairs(listOfFunds, investmentAmount, investmentRatioMap);
-        Integer rest = calculateUndistributedRest(investmentAmount, amountPercentPairsList);
-        Map<Long, AmountPercentPair> distributionMap = amountPercentPairsList.stream()
-                                                                             .collect(Collectors.toMap(AmountPercentPair::getFundID,
-                                                                                                       amountPercentPair -> amountPercentPair));
+
+        List<CalculationResult> calculationResults = new ArrayList<>();
+        for (FundType fundType : investmentStyle.getFundTypeSet()) {
+            List<Fund> funds = filterFundsByType(listOfFunds, fundType);
+            List<BigDecimal> percentageDistribution = distributionCalculator.calculatePercentageDistribution(
+                    funds.size(),
+                    investmentStyle.getInvestmentRatioByType(fundType));
+            List<Integer> amountDistribution = distributionCalculator.calculateAmountDistribution(percentageDistribution, investmentAmount);
+            calculationResults.addAll(
+                    resultListProducer.createCalculationResultList(getListOfIDsFromFundList(funds), percentageDistribution, amountDistribution));
+        }
+        calculationResults.sort(Comparator.comparing(CalculationResult::getFundID));
+        Integer rest = distributionCalculator.calculateUndistributedRest(investmentAmount, calculationResults);
         return DistributionCalculation.builder()
-                                      .distributionMap(distributionMap)
+                                      .resultList(calculationResults)
                                       .undistributedRest(rest)
                                       .build();
     }
 
-    private List<AmountPercentPair> calculateAmountPercentPairs(List<Fund> listOfFunds, Integer investmentAmount, Map<FundType, BigDecimal> investmentRatioMap) {
-        Map<FundType, List<Fund>> fundsGroupedByType = listOfFunds
-                .stream()
-                .collect(Collectors.groupingBy(Fund::getType));
-
-        List<AmountPercentPair> amountPercentPairsList = new ArrayList<>();
-
-        fundsGroupedByType.keySet()
-                          .forEach(key -> amountPercentPairsList.addAll(
-                                  distributeListOfFunds(fundsGroupedByType.get(key), investmentAmount, investmentRatioMap.get(key))));
-        return amountPercentPairsList;
+    private List<Long> getListOfIDsFromFundList(List<Fund> listOfFunds) {
+        return listOfFunds.stream()
+                          .map(Fund::getId)
+                          .collect(Collectors.toList());
     }
 
-    private List<AmountPercentPair> distributeListOfFunds(List<Fund> funds, Integer investmentAmount, BigDecimal investmentRatio) {
-        if (funds.isEmpty()) {
-            return new ArrayList<>();
-        }
-        BigDecimal HUNDRED_PERCENT = new BigDecimal("100");
-        int FIRST_ELEMENT = 0;
-        int listSize = funds.size();
-        BigDecimal availableAmount = BigDecimal.valueOf(investmentAmount);
-        BigDecimal singleFundRatio = investmentRatio.divide(BigDecimal.valueOf(listSize), 4, RoundingMode.DOWN);
-        List<AmountPercentPair> distributionList = new ArrayList<>();
-        funds.forEach(fund -> distributionList.add(AmountPercentPair.builder()
-                                                                .fundID(fund.getId())
-                                                                .amount(availableAmount.multiply(singleFundRatio).intValue())
-                                                                .percent(formatPercentDisplay(singleFundRatio.multiply(HUNDRED_PERCENT)))
-                                                                .build()));
-        if (!singleFundRatio.multiply(BigDecimal.valueOf(listSize))
-                            .equals(investmentRatio)) {
-            BigDecimal delta = investmentRatio.subtract(singleFundRatio.multiply(BigDecimal.valueOf(listSize)));
-            BigDecimal enlargedSingleFundRatio = singleFundRatio.add(delta);
-            distributionList.get(FIRST_ELEMENT)
-                            .setAmount(enlargedSingleFundRatio.multiply(availableAmount)
-                                                              .intValue());
-            distributionList.get(FIRST_ELEMENT)
-                            .setPercent(formatPercentDisplay(enlargedSingleFundRatio.multiply(HUNDRED_PERCENT)));
-        }
-        return distributionList;
+    private List<Fund> filterFundsByType(List<Fund> listOfFunds, FundType fundType) {
+        return listOfFunds.stream()
+                          .filter(fund -> fund.getType()
+                                              .equals(fundType))
+                          .collect(Collectors.toList());
     }
 
-    private Integer calculateUndistributedRest(Integer investmentAmount, List<AmountPercentPair> amountPercentPairList) {
-        Integer distributedSum = amountPercentPairList
-                .stream()
-                .map(AmountPercentPair::getAmount)
-                .reduce(Integer::sum)
-                .orElse(0);
-        return investmentAmount - distributedSum;
-    }
-
-    private String formatPercentDisplay(BigDecimal numberToFormat){
-        return numberToFormat.setScale(2, RoundingMode.DOWN).stripTrailingZeros().toPlainString();
-    }
 
 }

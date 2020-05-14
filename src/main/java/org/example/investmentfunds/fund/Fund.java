@@ -1,4 +1,4 @@
-package org.example.investmentfunds.model;
+package org.example.investmentfunds.fund;
 
 import lombok.Builder;
 import lombok.Data;

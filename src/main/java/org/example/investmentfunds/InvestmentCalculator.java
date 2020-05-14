@@ -1,8 +1,8 @@
 package org.example.investmentfunds;
 
 import org.example.investmentfunds.investment.style.InvestmentStyle;
-import org.example.investmentfunds.model.DistributionCalculation;
-import org.example.investmentfunds.model.Fund;
+import org.example.investmentfunds.distribution.DistributionCalculation;
+import org.example.investmentfunds.fund.Fund;
 
 import java.util.List;
 

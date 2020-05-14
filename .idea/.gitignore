@@ -1,0 +1,11 @@
+# Compiled class file
+*.class
+
+# Package Files #
+*.jar
+*.zip
+*.tar.gz
+*.rar
+
+# Default ignored files
+/workspace.xml
