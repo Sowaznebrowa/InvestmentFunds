@@ -13,11 +13,6 @@ public class Balanced implements InvestmentStyle {
                                                                   FundType.CASH, new BigDecimal("0.10"));
 
     @Override
-    public Map<FundType, BigDecimal> getInvestmentRatioMap() {
-        return investmentRatioMap;
-    }
-
-    @Override
     public BigDecimal getInvestmentRatioByType(FundType fundType) {
         return investmentRatioMap.get(fundType);
     }

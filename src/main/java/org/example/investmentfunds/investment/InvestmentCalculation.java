@@ -1,4 +1,4 @@
-package org.example.investmentfunds.distribution;
+package org.example.investmentfunds.investment;
 
 import lombok.Builder;
 import lombok.Data;
@@ -8,7 +8,7 @@ import java.util.List;
 
 @Data
 @Builder
-public class DistributionCalculation {
+public class InvestmentCalculation {
 
     private List<CalculationResult> resultList;
     private Integer undistributedRest;
