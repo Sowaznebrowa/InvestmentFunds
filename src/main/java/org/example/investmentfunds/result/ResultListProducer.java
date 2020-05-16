@@ -29,6 +29,6 @@ public class ResultListProducer {
         return numberToFormat.multiply(HUNDRED_PERCENT)
                              .setScale(2, RoundingMode.DOWN)
                              .stripTrailingZeros()
-                             .toPlainString();
+                             .toPlainString() + '%';
     }
 }

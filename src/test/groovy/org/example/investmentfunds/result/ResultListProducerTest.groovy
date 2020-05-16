@@ -1,6 +1,7 @@
 package org.example.investmentfunds.result
 
 import org.example.investmentfunds.TestBase
+import spock.lang.Unroll
 
 class ResultListProducerTest extends TestBase {
 
@@ -19,25 +20,30 @@ class ResultListProducerTest extends TestBase {
     def "Should produce result list from provided distribution"() {
         given:
         def expectedResult = [
-                CalculationResult.builder().fundID(1L).percent("8.34").amount(834).build(),
-                CalculationResult.builder().fundID(2L).percent("8.33").amount(833).build(),
-                CalculationResult.builder().fundID(3L).percent("8.33").amount(833).build(),
+                CalculationResult.builder().fundID(1L).percent("8.34%").amount(834).build(),
+                CalculationResult.builder().fundID(2L).percent("8.33%").amount(833).build(),
+                CalculationResult.builder().fundID(3L).percent("8.33%").amount(833).build(),
         ]
+
         when:
         def obtainedResult = resultListProducer.createCalculationResultList(
                 listOfIDs,
                 percentageDistribution,
                 amountDistribution)
+
         then:
         obtainedResult == expectedResult
     }
 
+    @Unroll
     def "Should throw exception when one of arguments has different size"() {
+
         when:
         resultListProducer.createCalculationResultList(
                 idsList as List<Long>,
                 percentageList as List<BigDecimal>,
                 amountList as List<Integer>)
+
         then:
         def exception = thrown(expectedException)
         exception.message == exceptionMessage
