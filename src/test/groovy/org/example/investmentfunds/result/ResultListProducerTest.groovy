@@ -12,17 +12,17 @@ class ResultListProducerTest extends TestBase {
             new BigDecimal("0.0833"),
     ]
     static def amountDistribution = [
-            new Integer(834),
-            new Integer(833),
-            new Integer(833),
+            new BigDecimal(834),
+            new BigDecimal(833),
+            new BigDecimal(833),
     ]
 
     def "Should produce result list from provided distribution"() {
         given:
         def expectedResult = [
-                CalculationResult.builder().fundID(1L).percent("8.34%").amount(834).build(),
-                CalculationResult.builder().fundID(2L).percent("8.33%").amount(833).build(),
-                CalculationResult.builder().fundID(3L).percent("8.33%").amount(833).build(),
+                CalculationResult.builder().fundID(1L).percent("8.34%").amount("834").build(),
+                CalculationResult.builder().fundID(2L).percent("8.33%").amount("833").build(),
+                CalculationResult.builder().fundID(3L).percent("8.33%").amount("833").build(),
         ]
 
         when:
@@ -42,7 +42,7 @@ class ResultListProducerTest extends TestBase {
         resultListProducer.createCalculationResultList(
                 idsList as List<Long>,
                 percentageList as List<BigDecimal>,
-                amountList as List<Integer>)
+                amountList as List<BigDecimal>)
 
         then:
         def exception = thrown(expectedException)
@@ -50,8 +50,8 @@ class ResultListProducerTest extends TestBase {
 
         where:
         idsList   || percentageList             || amountList         || expectedException              || exceptionMessage
-        [1L, 2L]  || percentageDistribution     || amountDistribution || NonEqualArgumentsSizeException || "All method arguments should be equal size"
-        listOfIDs || [new BigDecimal("0.0834")] || amountDistribution || NonEqualArgumentsSizeException || "All method arguments should be equal size"
-        listOfIDs || percentageDistribution     || [new Integer(834)] || NonEqualArgumentsSizeException || "All method arguments should be equal size"
+        [1L, 2L]  || percentageDistribution     || amountDistribution || NonEqualArgumentsSizeException || "All method arguments should be equal in size"
+        listOfIDs || [new BigDecimal("0.0834")] || amountDistribution || NonEqualArgumentsSizeException || "All method arguments should be equal in size"
+        listOfIDs || percentageDistribution     || [new BigDecimal(834)] || NonEqualArgumentsSizeException || "All method arguments should be equal in size"
     }
 }

@@ -1,6 +1,8 @@
 package org.example.investmentfunds
 
-import org.example.investmentfunds.distribution.DistributionCalculator
+import org.example.investmentfunds.distribution.AmountDistributionCalculator
+import org.example.investmentfunds.distribution.PercentageDistributionCalculator
+import org.example.investmentfunds.distribution.UndistributedRestCalculator
 import org.example.investmentfunds.fund.Fund
 import org.example.investmentfunds.fund.FundType
 import org.example.investmentfunds.investment.DistributionBasedInvestmentCalculator
@@ -24,10 +26,15 @@ class TestBase extends Specification{
     def agressiveInvestmentStyle = new Agressive()
     def balancedInvestmentStyle = new Balanced()
 
-    DistributionCalculator distributionCalculator = new DistributionCalculator()
+    PercentageDistributionCalculator percentageDistributionCalculator = new PercentageDistributionCalculator()
+    AmountDistributionCalculator amountDistributionCalculator = new AmountDistributionCalculator()
+    UndistributedRestCalculator undistributedRestCalculator = new UndistributedRestCalculator()
+
     ResultListProducer resultListProducer = new ResultListProducer()
     InvestmentCalculator investmentCalculator = new DistributionBasedInvestmentCalculator(
-            distributionCalculator,
+            percentageDistributionCalculator,
+            amountDistributionCalculator,
+            undistributedRestCalculator,
             resultListProducer)
 
 }

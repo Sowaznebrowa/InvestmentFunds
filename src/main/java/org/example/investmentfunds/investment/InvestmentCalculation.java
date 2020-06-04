@@ -4,6 +4,8 @@ import lombok.Builder;
 import lombok.Data;
 import org.example.investmentfunds.result.CalculationResult;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
 
 @Data
@@ -11,5 +13,5 @@ import java.util.List;
 public class InvestmentCalculation {
 
     private List<CalculationResult> resultList;
-    private Integer undistributedRest;
+    private BigInteger undistributedRest;
 }

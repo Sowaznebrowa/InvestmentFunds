@@ -11,19 +11,19 @@ class DistributionBasedInvestmentCalculatorTest extends TestBase {
         given:
         def expectedInvestmentCalculation = InvestmentCalculation.builder()
                 .resultList([
-                        CalculationResult.builder().fundID(1L).amount(1000).percent("10%").build(),
-                        CalculationResult.builder().fundID(2L).amount(1000).percent("10%").build(),
-                        CalculationResult.builder().fundID(3L).amount(2500).percent("25%").build(),
-                        CalculationResult.builder().fundID(4L).amount(2500).percent("25%").build(),
-                        CalculationResult.builder().fundID(5L).amount(2500).percent("25%").build(),
-                        CalculationResult.builder().fundID(6L).amount(500).percent("5%").build(),
+                        CalculationResult.builder().fundID(1L).amount("1000").percent("10%").build(),
+                        CalculationResult.builder().fundID(2L).amount("1000").percent("10%").build(),
+                        CalculationResult.builder().fundID(3L).amount("2500").percent("25%").build(),
+                        CalculationResult.builder().fundID(4L).amount("2500").percent("25%").build(),
+                        CalculationResult.builder().fundID(5L).amount("2500").percent("25%").build(),
+                        CalculationResult.builder().fundID(6L).amount("500").percent("5%").build(),
                 ])
-                .undistributedRest(0)
+                .undistributedRest(BigInteger.ZERO)
                 .build()
         when:
         def calculatedInvestment = investmentCalculator.calculateInvestment(
                 fundsList,
-                10000,
+                new BigInteger("10000"),
                 safeInvestmentStyle)
         then:
         calculatedInvestment == expectedInvestmentCalculation
@@ -33,17 +33,17 @@ class DistributionBasedInvestmentCalculatorTest extends TestBase {
     def "should return investment calculation for agressive style"() {
         given:
         def expectedInvestmentCalculation = InvestmentCalculation.builder().resultList([
-                CalculationResult.builder().fundID(1L).amount(2000).percent("20%").build(),
-                CalculationResult.builder().fundID(2L).amount(2000).percent("20%").build(),
-                CalculationResult.builder().fundID(3L).amount(668).percent("6.68%").build(),
-                CalculationResult.builder().fundID(4L).amount(666).percent("6.66%").build(),
-                CalculationResult.builder().fundID(5L).amount(666).percent("6.66%").build(),
-                CalculationResult.builder().fundID(6L).amount(4000).percent("40%").build(),
-        ]).undistributedRest(0).build()
+                CalculationResult.builder().fundID(1L).amount("2000").percent("20%").build(),
+                CalculationResult.builder().fundID(2L).amount("2000").percent("20%").build(),
+                CalculationResult.builder().fundID(3L).amount("668").percent("6.68%").build(),
+                CalculationResult.builder().fundID(4L).amount("666").percent("6.66%").build(),
+                CalculationResult.builder().fundID(5L).amount("666").percent("6.66%").build(),
+                CalculationResult.builder().fundID(6L).amount("4000").percent("40%").build(),
+        ]).undistributedRest(BigInteger.ZERO).build()
         when:
         def calculatedInvestment = investmentCalculator.calculateInvestment(
                 fundsList,
-                10000,
+                new BigInteger("10000"),
                 agressiveInvestmentStyle)
         then:
         calculatedInvestment == expectedInvestmentCalculation
@@ -52,15 +52,15 @@ class DistributionBasedInvestmentCalculatorTest extends TestBase {
     def "should return investment calculation for balanced style"() {
         given:
         def expectedInvestmentCalculation = InvestmentCalculation.builder().resultList([
-                CalculationResult.builder().fundID(1L).amount(1500).percent("15%").build(),
-                CalculationResult.builder().fundID(2L).amount(1500).percent("15%").build(),
-                CalculationResult.builder().fundID(3L).amount(2000).percent("20%").build(),
-                CalculationResult.builder().fundID(4L).amount(2000).percent("20%").build(),
-                CalculationResult.builder().fundID(5L).amount(2000).percent("20%").build(),
-                CalculationResult.builder().fundID(6L).amount(1000).percent("10%").build(),
-        ]).undistributedRest(0).build()
+                CalculationResult.builder().fundID(1L).amount("1500").percent("15%").build(),
+                CalculationResult.builder().fundID(2L).amount("1500").percent("15%").build(),
+                CalculationResult.builder().fundID(3L).amount("2000").percent("20%").build(),
+                CalculationResult.builder().fundID(4L).amount("2000").percent("20%").build(),
+                CalculationResult.builder().fundID(5L).amount("2000").percent("20%").build(),
+                CalculationResult.builder().fundID(6L).amount("1000").percent("10%").build(),
+        ]).undistributedRest(BigInteger.ZERO).build()
         when:
-        def calculatedInvestment = investmentCalculator.calculateInvestment(fundsList, 10000, balancedInvestmentStyle)
+        def calculatedInvestment = investmentCalculator.calculateInvestment(fundsList, new BigInteger("10000"), balancedInvestmentStyle)
         then:
         calculatedInvestment == expectedInvestmentCalculation
     }
@@ -68,15 +68,15 @@ class DistributionBasedInvestmentCalculatorTest extends TestBase {
     def "should return investment calculation with undistributed rest"() {
         given:
         def expectedInvestmentCalculation = InvestmentCalculation.builder().resultList([
-                CalculationResult.builder().fundID(1L).amount(1000).percent("10%").build(),
-                CalculationResult.builder().fundID(2L).amount(1000).percent("10%").build(),
-                CalculationResult.builder().fundID(3L).amount(2500).percent("25%").build(),
-                CalculationResult.builder().fundID(4L).amount(2500).percent("25%").build(),
-                CalculationResult.builder().fundID(5L).amount(2500).percent("25%").build(),
-                CalculationResult.builder().fundID(6L).amount(500).percent("5%").build(),
-        ]).undistributedRest(1).build()
+                CalculationResult.builder().fundID(1L).amount("1000").percent("10%").build(),
+                CalculationResult.builder().fundID(2L).amount("1000").percent("10%").build(),
+                CalculationResult.builder().fundID(3L).amount("2500").percent("25%").build(),
+                CalculationResult.builder().fundID(4L).amount("2500").percent("25%").build(),
+                CalculationResult.builder().fundID(5L).amount("2500").percent("25%").build(),
+                CalculationResult.builder().fundID(6L).amount("500").percent("5%").build(),
+        ]).undistributedRest(BigInteger.ONE).build()
         when:
-        def calculatedInvestment = investmentCalculator.calculateInvestment(fundsList, 10001, safeInvestmentStyle)
+        def calculatedInvestment = investmentCalculator.calculateInvestment(fundsList, new BigInteger("10001"), safeInvestmentStyle)
         then:
         calculatedInvestment == expectedInvestmentCalculation
     }
@@ -92,15 +92,15 @@ class DistributionBasedInvestmentCalculatorTest extends TestBase {
                 Fund.builder().id(6).type(FundType.CASH).name("Fundusz Pieniężny 1").build(),
         ]
         def expectedInvestmentCalculation = InvestmentCalculation.builder().resultList([
-                CalculationResult.builder().fundID(1L).amount(668).percent("6.68%").build(),
-                CalculationResult.builder().fundID(2L).amount(666).percent("6.66%").build(),
-                CalculationResult.builder().fundID(3L).amount(666).percent("6.66%").build(),
-                CalculationResult.builder().fundID(4L).amount(3750).percent("37.5%").build(),
-                CalculationResult.builder().fundID(5L).amount(3750).percent("37.5%").build(),
-                CalculationResult.builder().fundID(6L).amount(500).percent("5%").build(),
-        ]).undistributedRest(0).build()
+                CalculationResult.builder().fundID(1L).amount("668").percent("6.68%").build(),
+                CalculationResult.builder().fundID(2L).amount("666").percent("6.66%").build(),
+                CalculationResult.builder().fundID(3L).amount("666").percent("6.66%").build(),
+                CalculationResult.builder().fundID(4L).amount("3750").percent("37.5%").build(),
+                CalculationResult.builder().fundID(5L).amount("3750").percent("37.5%").build(),
+                CalculationResult.builder().fundID(6L).amount("500").percent("5%").build(),
+        ]).undistributedRest(BigInteger.ZERO).build()
         when:
-        def calculatedInvestment = investmentCalculator.calculateInvestment(fundList, 10000, safeInvestmentStyle)
+        def calculatedInvestment = investmentCalculator.calculateInvestment(fundList, new BigInteger("10000"), safeInvestmentStyle)
         then:
         calculatedInvestment == expectedInvestmentCalculation
     }
